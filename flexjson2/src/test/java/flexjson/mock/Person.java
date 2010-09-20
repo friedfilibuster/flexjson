@@ -17,7 +17,6 @@ package flexjson.mock;
 
 import flexjson.JSON;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,11 +26,10 @@ public class Person {
     private String firstname;
     private String lastname;
     private Date birthdate;
-    private Timestamp firstBaseBallGame;
     private Address home;
     private Address work;
-    private List<Phone> phones = new ArrayList<Phone>();
-    private List<String> hobbies = new ArrayList<String>();
+    private List phones = new ArrayList();
+    private List hobbies = new ArrayList();
 
     public Person() {
     }
@@ -86,28 +84,20 @@ public class Person {
         if( work != null ) this.work.setPerson(this);
     }
 
-    public List<Phone> getPhones() {
+    public List getPhones() {
         return phones;
     }
 
-    public void setPhones(List<Phone> phones) {
+    public void setPhones(List phones) {
         this.phones = phones;
     }
 
     @JSON(include = false)
-    public List<String> getHobbies() {
+    public List getHobbies() {
         return hobbies;
     }
 
-    public void setHobbies(List<String> hobbies) {
+    public void setHobbies(List hobbies) {
         this.hobbies = hobbies;
-    }
-
-    public Timestamp getFirstBaseBallGame() {
-        return firstBaseBallGame;
-    }
-
-    public void setFirstBaseBallGame(Timestamp firstBaseBallGame) {
-        this.firstBaseBallGame = firstBaseBallGame;
     }
 }

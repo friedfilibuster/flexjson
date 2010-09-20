@@ -211,10 +211,7 @@ public class JSONContext {
 
     public void writeName(String name) {
         if (prettyPrint) writeIndent();
-        if( name != null )
-            writeQuoted(name);
-        else
-            write( "null" );
+        writeQuoted(name);
         out.write(":");
         if (prettyPrint) out.write(" ");
     }
@@ -399,9 +396,8 @@ public class JSONContext {
          * element serialization before we begin to ingore List and Iterable.
          */
 
-        if( value != null &&
-            ((serializationType == SerializationType.SHALLOW && (rootName != null && path.length() > 1)) ||
-            (serializationType == SerializationType.SHALLOW && (rootName == null)))) {
+        if( (serializationType == SerializationType.SHALLOW && (rootName != null && path.length() > 1)) ||
+            (serializationType == SerializationType.SHALLOW && (rootName == null))) {
 
             Class type = value.getClass();
             return !( type.isArray() || Iterable.class.isAssignableFrom(type));
