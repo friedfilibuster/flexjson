@@ -31,9 +31,9 @@ public class MapTransformer extends AbstractTransformer {
         TypeContext typeContext = getContext().writeOpenObject();
         for (Object key : value.keySet()) {
 
-            path.enqueue(key != null ? key.toString() : null);
+            path.enqueue((String) key);
 
-            if (context.isIncluded(key != null ? key.toString() : null, value.get(key))) {
+            if (context.isIncluded((String) key, value.get(key))) {
 
                 TransformerWrapper transformer = (TransformerWrapper)context.getTransformer(value.get(key));
 
@@ -41,18 +41,10 @@ public class MapTransformer extends AbstractTransformer {
                 if(!transformer.isInline()) {
                     if (!typeContext.isFirst()) getContext().writeComma();
                     typeContext.setFirst(false);
-                    if( key != null ) {
-                        getContext().writeName(key.toString());
-                    } else {
-                        getContext().writeName(null);
-                    }
+                    getContext().writeName(key.toString());
                 }
-
-                if( key != null ) {
-                    typeContext.setPropertyName(key.toString());
-                } else {
-                    typeContext.setPropertyName(null);
-                }
+                
+                typeContext.setPropertyName(key.toString());
 
                 transformer.transform(value.get(key));
 

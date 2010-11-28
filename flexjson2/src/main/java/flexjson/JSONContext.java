@@ -17,7 +17,9 @@ package flexjson;
 
 import flexjson.transformer.*;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
@@ -209,10 +211,7 @@ public class JSONContext {
 
     public void writeName(String name) {
         if (prettyPrint) writeIndent();
-        if( name != null )
-            writeQuoted(name);
-        else
-            write( "null" );
+        writeQuoted(name);
         out.write(":");
         if (prettyPrint) out.write(" ");
     }
@@ -360,15 +359,15 @@ public class JSONContext {
         this.pathExpressions = pathExpressions;
     }
 
-    public boolean isIncluded(BeanProperty prop) {
+    public boolean isIncluded(PropertyDescriptor prop) {
         PathExpression expression = matches( pathExpressions );
         if (expression != null) {
             return expression.isIncluded();
         }
 
-        Boolean annotation = prop.isAnnotated();
-        if( annotation != null ) {
-            return annotation;
+        Method accessor = prop.getReadMethod();
+        if (accessor.isAnnotationPresent(JSON.class)) {
+            return accessor.getAnnotation(JSON.class).include();
         }
 
         if (serializationType == SerializationType.SHALLOW) {
@@ -377,6 +376,7 @@ public class JSONContext {
         } else {
             return true;
         }
+
     }
 
     public boolean isIncluded(String key, Object value) {
@@ -396,9 +396,8 @@ public class JSONContext {
          * element serialization before we begin to ingore List and Iterable.
          */
 
-        if( value != null &&
-            ((serializationType == SerializationType.SHALLOW && (rootName != null && path.length() > 1)) ||
-            (serializationType == SerializationType.SHALLOW && (rootName == null)))) {
+        if( (serializationType == SerializationType.SHALLOW && (rootName != null && path.length() > 1)) ||
+            (serializationType == SerializationType.SHALLOW && (rootName == null))) {
 
             Class type = value.getClass();
             return !( type.isArray() || Iterable.class.isAssignableFrom(type));

@@ -20,12 +20,10 @@ import flexjson.transformer.FlatDateTransformer;
 import flexjson.transformer.StateTransformer;
 import flexjson.transformer.StringArrayTransformer;
 import junit.framework.TestCase;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
-import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -372,7 +370,7 @@ public class SimpleSerializeTest extends TestCase {
 
         Account account2 = new Account();
         account2.setId(2);
-        account2.setName("Joe \"Savings\"");
+        account2.setName("Joe Savings");
         account2.setAccountType(AccountType.Savings);
         account2.setAccountNumber("00007654321");
         account2.setBalance(new BigDecimal("800.20"));
@@ -390,14 +388,4 @@ public class SimpleSerializeTest extends TestCase {
         return person;
     }
 
-    /**
-     * http://sourceforge.net/tracker/?func=detail&atid=947842&aid=3088061&group_id=194042
-     */
-    public void testSerializeWithWriter() {
-        JSONSerializer serializer = new JSONSerializer();
-        Writer w = new StringWriter();
-        Person person = buildPerson1();
-        person.setFirstName("x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\"x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\"x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\"x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\" x=\"0123456789\"");
-        serializer.deepSerialize(person, w);
-    }
 }
