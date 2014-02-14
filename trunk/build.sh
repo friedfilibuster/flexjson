@@ -1,1 +1,0 @@
-mvn clean javadoc:javadoc assembly:assembly
