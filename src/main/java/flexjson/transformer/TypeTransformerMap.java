@@ -15,49 +15,39 @@
  */
 package flexjson.transformer;
 
+
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class is used to lookup type transformers from specific to generic implementation.
  * For example if an ArrayList transformer is provided
  */
-public class TypeTransformerMap extends ConcurrentHashMap<Class, Transformer> {
+public class TypeTransformerMap {
 
-    private TypeTransformerMap parentTransformerMap;
+    private final Map<Class, Transformer> transformers;
 
-    protected boolean locked;
-
-    public TypeTransformerMap() {
+    public TypeTransformerMap(Map<Class, Transformer> transformers) {
+        this.transformers = Collections.synchronizedMap(new HashMap<Class, Transformer>(transformers));
     }
 
     public TypeTransformerMap(TypeTransformerMap parentTransformerMap) {
-        this.parentTransformerMap = parentTransformerMap;
+        this(parentTransformerMap.transformers);
     }
 
     @SuppressWarnings("unchecked")
     public Transformer getTransformer(Object key) {
-        // look locally;
         LookupContext lookupContext = new LookupContext();
         Class keyClass = (key == null ? void.class : key.getClass());
 
         Transformer transformer = findTransformer(keyClass, keyClass, lookupContext);
-
-        if (transformer == null && parentTransformerMap != null) {
-            // look in parent
-            // if no transformers found in child then check parent
-            transformer = parentTransformerMap.getTransformer(key);
-            if (transformer != null) {
-                putTransformer(key == null ? void.class : key.getClass(), transformer);
-            }
-        }
-        if (!lookupContext.isCached()) {
+        if (!lookupContext.isCached() && transformer != null) {
             // If there was not a transformer directly mapped to the key
             // then cache it for future lookups
             putTransformer(keyClass, transformer);
         }
-
         return transformer;
     }
 
@@ -66,14 +56,14 @@ public class TypeTransformerMap extends ConcurrentHashMap<Class, Transformer> {
         if (key == null) return null;
 
         // if specific type found
-        if (containsKey(key)) {
+        if (transformers.containsKey(key)) {
             if (key != originalKey) {
                 // this transformer has not been associated with the provided key
                 // set cache to false so that the key and transformer are put
                 // in the map contents and future lookups occur more quickly
                 lookupContext.setCached(false);
             }
-            return get(key);
+            return transformers.get(key);
         }
 
         // handle arrays specially if no specific array type handler
@@ -85,7 +75,7 @@ public class TypeTransformerMap extends ConcurrentHashMap<Class, Transformer> {
             // set cache to false so that the key and transformer are put
             // in the map contents and future lookups occur more quickly
             lookupContext.setCached(false);
-            return get(Arrays.class);
+            return transformers.get(Arrays.class);
         }
 
         // check for interface transformer
@@ -100,11 +90,12 @@ public class TypeTransformerMap extends ConcurrentHashMap<Class, Transformer> {
     }
 
     public Transformer putTransformer(Class aClass, Transformer transformer) {
-        // only make changes to the child TypeTransformerMap
-        if (!locked) {
-            put(aClass, transformer);
-        }
+        transformers.put(aClass, transformer);
         return transformer;
+    }
+
+    public boolean containsKey(Class stateClass) {
+        return transformers.containsKey(stateClass);
     }
 
     class LookupContext {
