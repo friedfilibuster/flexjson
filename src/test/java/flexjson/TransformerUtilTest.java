@@ -15,7 +15,7 @@ public class TransformerUtilTest {
         // Default is not modifiable
         TypeTransformerMap typeTransformerMap = TransformerUtil.getDefaultTypeTransformers();
         typeTransformerMap.getTransformer(new State());
-        assertFalse("TypeTransformerMap should not contain this key", typeTransformerMap.containsKey(State.class));
+        assertFalse("TypeTransformerMap should not contain this key", TransformerUtil.getDefaultTypeTransformers().containsKey(State.class));
 
     }
 
@@ -27,5 +27,4 @@ public class TransformerUtilTest {
         assertTrue("TypeTransformerMap should contain this key", freshTypeTransformerMap.containsKey(State.class));
 
     }
-
 }
