@@ -15,11 +15,14 @@
  */
 package flexjson;
 
-import flexjson.transformer.*;
+import flexjson.transformer.Transformer;
+import flexjson.transformer.TypeTransformerMap;
 
 import java.util.*;
 
 public class JSONContext {
+
+    private final static char[] HEX = "0123456789ABCDEF".toCharArray();
 
     private static ThreadLocal<JSONContext> context = new ThreadLocal<JSONContext>() {
         protected JSONContext initialValue() {
@@ -302,21 +305,15 @@ public class JSONContext {
             }
         }
 
-        out.write("\"");
+        out.write('\"');
         int last = 0;
         int len = value.length();
         for( int i = 0; i < len; i++ ) {
             char c = value.charAt(i);
             if (c == '"') {
                 last = out.write(value, last, i, "\\u0022");
-            } else if (c == '&') {
-                last = out.write(value, last, i, "\\u0026");
             } else if (c == '\'') {
                 last = out.write(value, last, i, "\\u0027");
-            } else if (c == '<') {
-                last = out.write(value, last, i, "\\u003c");
-            } else if (c == '>') {
-                last = out.write(value, last, i, "\\u003e");
             } else if (c == '\\') {
                 last = out.write(value, last, i, "\\\\");
             } else if (c == '\b') {
@@ -337,7 +334,7 @@ public class JSONContext {
         if( last < value.length() ) {
             out.write( value, last, value.length() );
         }
-        out.write("\"");
+        out.write('\"');
     }
 
     private void unicode(char c) {
@@ -345,7 +342,7 @@ public class JSONContext {
         int n = c;
         for (int i = 0; i < 4; ++i) {
             int digit = (n & 0xf000) >> 12;
-            out.write(String.valueOf(JSONSerializer.HEX[digit]));
+            out.write(HEX[digit]);
             n <<= 4;
         }
     }

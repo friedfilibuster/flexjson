@@ -16,8 +16,8 @@
 package flexjson;
 
 import flexjson.transformer.Transformer;
-import flexjson.transformer.TypeTransformerMap;
 import flexjson.transformer.TransformerWrapper;
+import flexjson.transformer.TypeTransformerMap;
 
 import java.io.Writer;
 import java.util.ArrayList;
@@ -186,8 +186,6 @@ import java.util.Map;
  * </p>
  */
 public class JSONSerializer {
-
-    public final static char[] HEX = "0123456789ABCDEF".toCharArray();
 
     private TypeTransformerMap typeTransformerMap;
     private Map<Path, Transformer> pathTransformerMap = new HashMap<Path, Transformer>();

@@ -16,10 +16,9 @@
 package flexjson;
 
 import flexjson.mock.*;
+import flexjson.model.ListContainer;
 import flexjson.transformer.AbstractTransformer;
 import flexjson.transformer.DateTransformer;
-import flexjson.transformer.HtmlEncoderTransformer;
-import flexjson.model.ListContainer;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -262,7 +261,6 @@ public class JSONSerializerTest {
         assertSerializedTo("Hello\nWorld", "\"Hello\\nWorld\"");
         assertSerializedTo("Hello 'Charlie'", "\"Hello \\u0027Charlie\\u0027\"");
         assertSerializedTo("Hello \"Charlie\"", "\"Hello \\u0022Charlie\\u0022\"");
-        assertSerializedTo("</script>", "\"\\u003c/script\\u003e\"");
         assertSerializedTo(
                 "� Shadowing the senior pastor as he performed weekly duties including sermon\n" +
                 "preparation, wedding, funerals, and other activities.\n" +
@@ -280,7 +278,7 @@ public class JSONSerializerTest {
                 "announcements.\"");
         Map test = new HashMap();
         test.put("</script>", "</script>");
-        assertEquals("{\"\\u003c/script\\u003e\":\"\\u003c/script\\u003e\"}", new JSONSerializer().serialize(test));
+        assertEquals("{\"</script>\":\"</script>\"}", new JSONSerializer().serialize(test));
     }
 
     @Test
@@ -590,25 +588,7 @@ public class JSONSerializerTest {
 
     @Test
     public void testHtmlTransformation() {
-        String json = new JSONSerializer().transform(new HtmlEncoderTransformer(), "").serialize("Marker & Thompson");
-        assertEquals("Assert that the & was replaced with &amp;", "\"Marker &amp; Thompson\"", json);
-
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("Chuck D", "Chuck D <chuckd@publicenemy.com>");
-        map.put("Run", "Run <run@rundmc.com>");
-        json = new JSONSerializer().transform(new HtmlEncoderTransformer(), String.class).serialize(map);
-        assertStringValue("Chuck D &lt;chuckd@publicenemy.com&gt;", json);
-        assertStringValue("Run &lt;run@rundmc.com&gt;", json);
-
-        Person xeno = new Person("><eno", "h&d", new Date(), new Address("1092 Hemphill", "Atlanta", "GA", new Zipcode("30319")), new Address("333 \"Diddle & Town\"", "Atlanta", "30329", new Zipcode("30320")));
-
-        json = new JSONSerializer().transform(new HtmlEncoderTransformer(), "firstname", "lastname").exclude("*.class").serialize(xeno);
-
-        assertStringValue("&gt;&lt;eno", json);
-        assertStringValue("h&amp;d", json);
-        assertStringValue("333 \\u0022Diddle \\u0026 Town\\u0022", json);
-        assertStringValueMissing("333 &quot;Diddle &amp; Town&quot;", json);
-        assertAttributeMissing("class", json);
+        // The spec does not include any of this escaping
     }
 
     @Test

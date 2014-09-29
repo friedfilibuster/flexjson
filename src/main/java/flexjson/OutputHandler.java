@@ -19,6 +19,8 @@ public interface OutputHandler {
 
     public OutputHandler write(String value);
 
+    public OutputHandler write(char c);
+
     public int write(String value, int start, int end, String append);
 
     public int write(String value, int start, int end);
